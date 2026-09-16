@@ -1,0 +1,45 @@
+name: Test Optano Docker Login
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-login:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate secrets are present
+        shell: bash
+        env:
+          PROGET_USERNAME: ${{ secrets.PROGET_USERNAME }}
+          PROGET_PASSWORD: ${{ secrets.PROGET_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${PROGET_USERNAME}" || -z "${PROGET_PASSWORD}" ]]; then
+            echo "::error::Missing GitHub Actions secret: PROGET_USERNAME or PROGET_PASSWORD"
+            exit 1
+          fi
+
+          echo "Secrets are configured."
+
+      - name: Log in to Optano Docker registry
+        shell: bash
+        env:
+          PROGET_USERNAME: ${{ secrets.PROGET_USERNAME }}
+          PROGET_PASSWORD: ${{ secrets.PROGET_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          printf '%s' "${PROGET_PASSWORD}" | \
+            docker login proget.optano.com \
+              --username "${PROGET_USERNAME}" \
+              --password-stdin
+
+      - name: Confirm Docker login works
+        run: |
+          docker info | head -n 20
+
+      - name: Log out
+        if: always()
+        run: docker logout proget.optano.com
