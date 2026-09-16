@@ -1,0 +1,32 @@
+name: Scheduler docker image to ACR
+ 
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+ 
+jobs:
+
+  build-and-push:
+
+    runs-on: ubuntu-latest
+ 
+    steps:
+
+    - name: Checkout repository
+
+      uses: actions/checkout@v3
+ 
+    - name: Log in to Docker Hub
+    
+      run: |
+
+        docker login -u "devadocker7909" -p "Sep01sep26!" docker.io
+        
+    - name: Pull image from Docker Hub
+
+      run: |
+
+        docker pull devadocker7909/webimg:latest
